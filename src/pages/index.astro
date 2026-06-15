@@ -9,10 +9,10 @@ const categories = getAutomatedCategories();
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Online Mega Store 🛒</title>
+    <title>AI HUB STORE 🛒</title>
     <style>
       body { font-family: system-ui, -apple-system, sans-serif; max-width: 1200px; margin: 0 auto; padding: 20px; background: #f8f9fa; color: #212529; }
-      h1 { text-align: center; margin-bottom: 30px; font-size: 2.5rem; }
+      h1 { text-align: center; margin-bottom: 30px; font-size: 2.5rem; letter-spacing: -0.5px; }
       nav { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 30px; background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); justify-content: center; }
       nav a { text-decoration: none; color: #495057; font-weight: 600; padding: 8px 16px; border-radius: 6px; background: #e9ecef; transition: all 0.2s; }
       nav a:hover { background: #0d6efd; color: white; }
@@ -28,7 +28,7 @@ const categories = getAutomatedCategories();
     </style>
   </head>
   <body>
-    <h1>Find Your Next Deal</h1>
+    <h1>AI HUB STORE</h1>
     
     <nav>
       <a href="/" style="background: #212529; color: white;">All Products</a>
@@ -42,7 +42,7 @@ const categories = getAutomatedCategories();
         <div class="card">
           <div>
             <img src={product.imageUrl} alt={product.title} loading="lazy" />
-            <span class="tag">Category ID: {product.categoryId}</span>
+            <span class="tag">Category: {product.categoryId}</span>
             <h3>{product.title}</h3>
           </div>
           <div>
@@ -53,7 +53,6 @@ const categories = getAutomatedCategories();
       ))}
     </div>
 
-    <!-- Client-side script that shuffles everything instantly on every load -->
     <script>
       document.addEventListener('DOMContentLoaded', () => {
         const grid = document.getElementById('products-grid');
@@ -61,7 +60,7 @@ const categories = getAutomatedCategories();
 
         const cards = Array.from(grid.children);
 
-        // Fisher-Yates Shuffle
+        // Fisher-Yates Shuffle algorithm
         for (let i = cards.length - 1; i > 0; i--) {
           const j = Math.floor(Math.random() * (i + 1));
           [cards[i], cards[j]] = [cards[j], cards[i]];
