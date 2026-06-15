@@ -12,19 +12,22 @@ export function getRawProducts() {
     trim: true
   });
 
-  return records.map(item => ({
-    id: item['Product Url'] ? item['Product Url'].split('/').pop().split('.')[0] : Math.random().toString(), 
-    title: item['Product Name'],
-    categoryId: item['CategoryID'] || 'uncategorized',
-    categoryName: item['Category Name'] || 'General',
-    imageUrl: item['Product Image Url'],
-    affiliateUrl: item['Click url'], 
-    price: item['SalePrice']
-  }));
+  return records.map(item => {
+    // Izvlačimo ID jedinstveno iz Promotion URL-a ili ProductId kolone
+    const prodId = item['ProductId'] || Math.random().toString();
+
+    return {
+      id: prodId,
+      title: item['Product Desc'], // Nova kolona za naziv proizvoda
+      imageUrl: item['Image Url'], // Nova kolona za sliku
+      videoUrl: item['Video Url'] || null, // Tvoja nova kolona za video
+      affiliateUrl: item['Promotion Url'], // Nova kolona za tvoj affiliate link
+      price: item['Discount Price'] ? `${item['Currency'] || '$'} ${item['Discount Price']}` : 'Check Price' // Spaja valutu i cenu
+    };
+  });
 }
 
+// Pošto novi fajl nema kategorije, vraćamo prazan niz da ne lomi ostatak koda
 export function getAutomatedCategories() {
-  const products = getRawProducts();
-  const uniqueIds = [...new Set(products.map(p => p.categoryId))];
-  return uniqueIds.sort();
+  return [];
 }
