@@ -2,6 +2,30 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { parse } from 'csv-parse/sync';
 
+// Funkcija koja automatski dodeljuje kategoriju na osnovu reči u naslovu
+function assignCategory(title) {
+  if (!title) return { id: 'other', name: 'Other Items' };
+  
+  const text = title.toLowerCase();
+  
+  // Možeš sam dodavati reči i menjati kategorije ovde:
+  if (text.includes('phone') || text.includes('mouse') || text.includes('keyboard') || text.includes('earphone') || text.includes('cable') || text.includes('charger') || text.includes('led') || text.includes('watch') || text.includes('smart')) {
+    return { id: 'tech', name: 'Tech & Gadgets' };
+  }
+  if (text.includes('dress') || text.includes('shirt') || text.includes('jacket') || text.includes('pants') || text.includes('shoes') || text.includes('bag') || text.includes('ring') || text.includes('jewelry')) {
+    return { id: 'fashion', name: 'Fashion & Style' };
+  }
+  if (text.includes('home') || text.includes('kitchen') || text.includes('cup') || text.includes('tool') || text.includes('light') || text.includes('decor') || text.includes('clean')) {
+    return { id: 'home', name: 'Home & Kitchen' };
+  }
+  if (text.includes('beauty') || text.includes('makeup') || text.includes('care') || text.includes('cream') || text.includes('hair')) {
+    return { id: 'beauty', name: 'Beauty & Health' };
+  }
+  
+  // Ako se nijedna reč ne poklopi, ide u opštu kategoriju
+  return { id: 'trending', name: 'Trending Deals' };
+}
+
 export function getRawProducts() {
   const csvPath = path.resolve('src/data/products.csv');
   const fileContent = fs.readFileSync(csvPath, 'utf-8');
@@ -13,21 +37,34 @@ export function getRawProducts() {
   });
 
   return records.map(item => {
-    // Izvlačimo ID jedinstveno iz Promotion URL-a ili ProductId kolone
-    const prodId = item['ProductId'] || Math.random().toString();
+    const title = item['Product Desc'] || '';
+    const catInfo = assignCategory(title); // Automatsko kategorisanje
 
     return {
-      id: prodId,
-      title: item['Product Desc'], // Nova kolona za naziv proizvoda
-      imageUrl: item['Image Url'], // Nova kolona za sliku
-      videoUrl: item['Video Url'] || null, // Tvoja nova kolona za video
-      affiliateUrl: item['Promotion Url'], // Nova kolona za tvoj affiliate link
-      price: item['Discount Price'] ? `${item['Currency'] || '$'} ${item['Discount Price']}` : 'Check Price' // Spaja valutu i cenu
+      id: item['ProductId'] || Math.random().toString(),
+      title: title,
+      imageUrl: item['Image Url'],
+      videoUrl: item['Video Url'] || null,
+      affiliateUrl: item['Promotion Url'],
+      price: item['Discount Price'] ? `${item['Currency'] || '$'} ${item['Discount Price']}` : 'Check Price',
+      categoryId: catInfo.id,
+      categoryName: catInfo.name
     };
   });
 }
 
-// Pošto novi fajl nema kategorije, vraćamo prazan niz da ne lomi ostatak koda
+// Izvlači samo one kategorije koje stvarno imaju proizvode u CSV-u
 export function getAutomatedCategories() {
-  return [];
+  const products = getRawProducts();
+  const uniqueCategories = [];
+  const seenIds = new Set();
+
+  products.forEach(p => {
+    if (!seenIds.has(p.categoryId)) {
+      seenIds.add(p.categoryId);
+      uniqueCategories.push({ id: p.categoryId, name: p.categoryName });
+    }
+  });
+
+  return uniqueCategories.sort((a, b) => a.name.localeCompare(b.name));
 }
