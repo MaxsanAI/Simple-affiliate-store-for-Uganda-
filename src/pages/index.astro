@@ -1,7 +1,8 @@
 ---
-import { getRawProducts } from '../utils/csvLoader';
+import { getRawProducts, getAutomatedCategories } from '../utils/csvLoader';
 
 const products = getRawProducts();
+const categories = getAutomatedCategories();
 ---
 
 <html lang="en">
@@ -11,22 +12,33 @@ const products = getRawProducts();
     <title>AI HUB STORE 🛒</title>
     <style>
       body { font-family: system-ui, -apple-system, sans-serif; max-width: 1200px; margin: 0 auto; padding: 20px; background: #f8f9fa; color: #212529; }
-      h1 { text-align: center; margin-bottom: 40px; font-size: 2.8rem; letter-spacing: -1px; font-weight: 800; color: #1a1d20; }
+      h1 { text-align: center; margin-bottom: 30px; font-size: 2.5rem; letter-spacing: -0.5px; font-weight: 800; }
+      nav { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 30px; background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); justify-content: center; }
+      nav a { text-decoration: none; color: #495057; font-weight: 600; padding: 8px 16px; border-radius: 6px; background: #e9ecef; transition: all 0.2s; }
+      nav a:hover { background: #0d6efd; color: white; }
       .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 25px; }
-      .card { background: white; padding: 20px; border-radius: 12px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.04); display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.2s, box-shadow 0.2s; }
-      .card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+      .card { background: white; padding: 20px; border-radius: 12px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.04); display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.2s; }
+      .card:hover { transform: translateY(-3px); }
       
-      .media-container { width: 100%; height: 200px; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 8px; background: #fff; }
+      .media-container { width: 100%; height: 200px; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 6px; }
       .card img, .card video { max-width: 100%; max-height: 100%; object-fit: contain; }
       
-      .card h3 { font-size: 0.95rem; line-height: 1.4; margin: 10px 0; height: 55px; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; color: #333; font-weight: 600; }
-      .price { font-size: 1.3rem; font-weight: 700; color: #198754; margin: 12px 0; }
+      .card h3 { font-size: 0.95rem; line-height: 1.4; margin: 10px 0; height: 55px; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; color: #333; }
+      .price { font-size: 1.25rem; font-weight: bold; color: #198754; margin: 10px 0; }
       .btn { display: block; background: #0d6efd; color: white; padding: 12px; text-decoration: none; border-radius: 6px; font-weight: bold; transition: background 0.2s; }
       .btn:hover { background: #0b5ed7; }
+      .tag { display: inline-block; font-size: 0.75rem; background: #e2e3e5; color: #41464b; padding: 4px 10px; border-radius: 4px; margin-top: 5px; font-weight: 500; }
     </style>
   </head>
   <body>
     <h1>AI HUB STORE</h1>
+    
+    <nav>
+      <a href="/" style="background: #212529; color: white;">All Products</a>
+      {categories.map((cat) => (
+        <a href={`/kategorija/${cat.id}`}>{cat.name}</a>
+      ))}
+    </nav>
 
     <div class="grid" id="products-grid">
       {products.map((product) => (
@@ -39,6 +51,7 @@ const products = getRawProducts();
                 <img src={product.imageUrl} alt={product.title} loading="lazy" />
               )}
             </div>
+            <span class="tag">{product.categoryName}</span>
             <h3>{product.title}</h3>
           </div>
           <div>
@@ -55,7 +68,6 @@ const products = getRawProducts();
         if (!grid) return;
 
         const cards = Array.from(grid.children);
-
         for (let i = cards.length - 1; i > 0; i--) {
           const j = Math.floor(Math.random() * (i + 1));
           [cards[i], cards[j]] = [cards[j], cards[i]];
